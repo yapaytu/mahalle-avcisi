@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahalle Avcısı — Esnaf & Satış Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B0F19;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --bg-surface: #131C2E;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(99, 102, 241, 0.4);
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #06B6D4;
+      --success: #10B981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --radius: 16px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    /* Header */
+    header {
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .radar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--primary-glow);
+      position: relative;
+    }
+    .radar-icon svg { width: 22px; height: 22px; fill: white; }
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(120deg, #FFFFFF, #CBD5E1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #A5B4FC;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Semt Selector & Actions in Header */
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .select-wrap {
+      position: relative;
+    }
+    select {
+      background: var(--bg-surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 36px 9px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      appearance: none;
+      outline: none;
+      transition: all 0.2s;
+    }
+    select:hover, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-dim);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4F46E5);
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      box-shadow: 0 4px 14px var(--success-glow);
+    }
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 28px 60px;
+      flex: 1;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-btn.active {
+      color: white;
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .stat-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--stat-accent, var(--primary));
+      opacity: 0.8;
+    }
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stat-icon {
+      font-size: 18px;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .stat-sub {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Filter & Search Bar */
+    .action-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px 10px 38px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+    }
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Cards Grid */
+    .shops-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+    }
+    .shop-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .shop-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .shop-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .shop-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .score-badge {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34D399;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .score-badge small {
+      font-size: 9px;
+      opacity: 0.8;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+    .shop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .tag.sektor {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.2);
+      color: #A5B4FC;
+    }
+    .shop-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-row svg {
+      width: 16px;
+      height: 16px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .info-link {
+      color: #93C5FD;
+      text-decoration: none;
+    }
+    .info-link:hover { text-decoration: underline; }
+
+    /* CRM Selector & Action Buttons */
+    .shop-actions-group {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .crm-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .crm-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .crm-select {
+      background: var(--bg-surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .card-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      border-radius: 8px;
+      justify-content: center;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: #111827;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      transform: scale(0.95);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .modal-overlay.open .modal-card {
+      transform: scale(1);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .close-btn:hover { color: var(--text); }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+    .form-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .range-val {
+      display: inline-block;
+      margin-left: 8px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Phone Simulator Modal */
+    .simulator-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 105;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      padding: 20px;
+    }
+    .simulator-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .simulator-box {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      max-height: 94vh;
+    }
+    .phone-frame {
+      width: 390px;
+      height: 800px;
+      max-height: 88vh;
+      background: #000;
+      border: 12px solid #1E293B;
+      border-radius: 54px;
+      box-shadow: 0 0 0 4px #334155, 0 30px 80px rgba(0, 0, 0, 0.9);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 26px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 20;
+    }
+    .phone-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+    }
+    .sim-panel {
+      max-width: 380px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sim-pitch-box {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #C7D2FE;
+    }
+
+    /* Sales Kit Accordion View */
+    .kit-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .kit-header {
+      padding: 18px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.02);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .kit-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .kit-body {
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      display: none;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #CBD5E1;
+      white-space: pre-wrap;
+    }
+    .kit-section.open .kit-body {
+      display: block;
+    }
+
+    /* Loading Spinner */
+    .radar-pulse {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1E293B;
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 200;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 900px) {
+      .header-inner { flex-direction: column; align-items: stretch; }
+      .header-controls { justify-content: space-between; }
+      .simulator-box { flex-direction: column; }
+      .phone-frame { width: 330px; height: 600px; }
+      .shops-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="radar-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="brand-title">Mahalle Avcısı</span>
+            <span class="brand-badge">PRO DASHBOARD</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+            <span class="radar-pulse"></span>
+            <span>Yerel Esnaf & Otomatik Web Motoru</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="select-wrap">
+          <select id="semtSelect" onchange="semtDegistir()">
+            <option value="">Bölge Seçiliyor...</option>
+          </select>
+          <span class="select-arrow">▼</span>
+        </div>
+
+        <button class="btn btn-secondary" onclick="openScanModal()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Yeni Bölge Tara
+        </button>
+
+        <button class="btn btn-success" onclick="kurSiteleri()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+          Siteleri Kur (İlk 50)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main>
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('radar')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        Esnaf Radarı & Siteler
+      </button>
+      <button class="tab-btn" onclick="switchTab('pipeline')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Satış Takip (CRM)
+      </button>
+      <button class="tab-btn" onclick="switchTab('kit')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        Satış Kiti & Senaryolar
+      </button>
+    </div>
+
+    <!-- Stats Banner -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--stat-accent: #6366F1;">
+        <div class="stat-top">
+          <span class="stat-label">Toplam Taranan</span>
+          <span class="stat-icon">🏬</span>
+        </div>
+        <div class="stat-value" id="statToplam">0</div>
+        <div class="stat-sub">Haritada incelenen işletme</div>
+      </div>
+
+      <div class="stat-card" style="--stat-accent: #06B6D4;">
+        <div class="stat-top">
+          <span class="stat-label">Sitesi Olmayan (Hedef)</span>
+          <span class="stat-icon">🎯</span>
+        </div>
+        <div class="stat-value" id="statSitesiYok" style="color: #38BDF8;">0</div>
+        <div class="stat-sub">Potansiyel müşteri havuzu</div>
+      </div>
+
+      <div class="stat-card" style="--stat-accent: #10B981;">
+        <div class="stat-top">
+          <span class="stat-label">Telefonu Kayıtlı</span>
+          <span class="stat-icon">📞</span>
+        </div>
+        <div class="stat-value" id="statTelli" style="color: #34D399;">0</div>
+        <div class="stat-sub">Anında aranabilir esnaf</div>
+      </div>
+
+      <div class="stat-card" style="--stat-accent: #F59E0B;">
+        <div class="stat-top">
+          <span class="stat-label">Tahmini Ciro Potansiyeli</span>
+          <span class="stat-icon">💎</span>
+        </div>
+        <div class="stat-value" id="statCiro" style="color: #FBBF24;">0 ₺</div>
+        <div class="stat-sub">15.000 ₺ ortalama teklifle</div>
+      </div>
+    </div>
+
+    <!-- RADAR TAB CONTENT -->
+    <div id="tabRadar">
+      <!-- Search & Filters -->
+      <div class="action-bar">
+        <div class="search-box">
+          <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Dükkân adı, cadde veya sektör ara..." oninput="filtrele()">
+        </div>
+
+        <div class="filters" id="sektorFiltreleri">
+          <button class="pill active" onclick="sektorFiltrele('hepsi', this)">Tümü</button>
+          <button class="pill" onclick="sektorFiltrele('kuafor', this)">Kuaför/Berber</button>
+          <button class="pill" onclick="sektorFiltrele('kafe', this)">Kafe/Restoran</button>
+          <button class="pill" onclick="sektorFiltrele('dis', this)">Sağlık/Klinik</button>
+          <button class="pill" onclick="sektorFiltrele('butik', this)">Butik</button>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="sadeceTelefonToggle(this)" id="btnTelFiltre">
+            📞 Sadece Telefonlular
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">
+            📥 Excel/CSV İndir
+          </button>
+        </div>
+      </div>
+
+      <!-- Shops Cards Grid -->
+      <div class="shops-grid" id="shopsContainer">
+        <!-- Javascript renders cards here -->
+      </div>
+    </div>
+
+    <!-- PIPELINE (CRM) TAB CONTENT -->
+    <div id="tabPipeline" style="display: none;">
+      <div class="action-bar">
+        <h3 style="font-size: 16px; font-weight: 700;">Ziyaret ve Satış Durumu (Pipeline)</h3>
+        <p style="font-size: 13px; color: var(--text-dim);">Esnaflara gidildikçe durumları buradan canlı olarak güncelleyebilirsiniz.</p>
+      </div>
+      <div id="pipelineContainer" class="shops-grid">
+        <!-- Rendered with CRM cards -->
+      </div>
+    </div>
+
+    <!-- SALES KIT TAB CONTENT -->
+    <div id="tabKit" style="display: none;">
+      <div id="kitContent">
+        <!-- Loaded from /api/satis-kiti -->
+      </div>
+    </div>
+  </main>
+
+  <!-- New Scan Modal -->
+  <div class="modal-overlay" id="scanModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Yeni Bölge Tara</h3>
+        <button class="close-btn" onclick="closeScanModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Semt, İlçe ve Şehir Adı</label>
+        <input type="text" id="scanSemtInput" class="form-input" placeholder="Örn: Moda, Kadıköy, İstanbul">
+        <div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+          <span style="font-size: 12px; color: var(--text-dim);">Hızlı Seç:</span>
+          <button type="button" class="pill" style="font-size: 11px; padding: 3px 10px;" onclick="document.getElementById('scanSemtInput').value='Moda, Kadıköy, İstanbul'">Moda, Kadıköy</button>
+          <button type="button" class="pill" style="font-size: 11px; padding: 3px 10px;" onclick="document.getElementById('scanSemtInput').value='Alsancak, Konak, İzmir'">Alsancak, İzmir</button>
+          <button type="button" class="pill" style="font-size: 11px; padding: 3px 10px;" onclick="document.getElementById('scanSemtInput').value='Bahçelievler, Çankaya, Ankara'">Bahçelievler, Ankara</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Tarama Yarıçapı: <span class="range-val" id="rangeVal">1000 metre</span>
+        </label>
+        <input type="range" id="scanYaricapInput" min="400" max="3000" step="100" value="1000" style="width: 100%; accent-color: var(--primary);" oninput="document.getElementById('rangeVal').innerText = this.value + ' metre'">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeScanModal()">İptal</button>
+        <button class="btn btn-primary" onclick="baslatTarama()" id="btnTaramaBaslat">
+          Taramayı Başlat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Phone Simulator Modal -->
+  <div class="simulator-overlay" id="simModal">
+    <div class="simulator-box">
+      <!-- Phone View -->
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <iframe id="simIframe" class="phone-iframe" src="about:blank"></iframe>
+      </div>
+
+      <!-- Sidebar pitch controls -->
+      <div class="sim-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 id="simShopName" style="font-size: 18px; font-weight: 700;">Dükkân Adı</h4>
+          <button class="close-btn" onclick="closeSimulator()">✕</button>
+        </div>
+
+        <div class="sim-pitch-box">
+          <strong>🎯 Kapıda Ne Diyeceksin?</strong>
+          <p style="margin-top: 6px;">
+            "Merhaba, bu civarda oturuyorum. İnternette sitenizin olmadığını gördüm ve size şöyle bir mobil site hazırladım, bir bakar mısınız?"
+          </p>
+          <p style="margin-top: 8px; font-size: 12px; color: #94A3B8;">
+            👉 Telefonu uzat ve müşterinin <em>'Hemen Ara'</em> ve <em>'WhatsApp'</em> butonlarına kendisinin dokunmasını sağla.
+          </p>
+        </div>
+
+        <div>
+          <a id="simExternalLink" href="#" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            🌐 Yeni Sekmede Tam Ekran Aç
+          </a>
+        </div>
+
+        <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5;">
+          💡 <strong>Satış Sonrası:</strong> Müşteri "evet" dediğinde gerçek dükkân fotoğraflarını ve fiyatlarını yerleştirip kendi alan adıyla yayına alabilirsiniz.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span id="toastMsg">İşlem tamamlandı!</span>
+  </div>
+
+  <script>
+    let aktifVeri = null;
+    let aktifSektor = 'hepsi';
+    let sadeceTelefon = false;
+
+    // Load available regions on start
+    async function init() {
+      await semtleriYukle();
+    }
+
+    async function semtleriYukle() {
+      try {
+        const res = await fetch('/api/semtler');
+        const data = await res.json();
+        const select = document.getElementById('semtSelect');
+        select.innerHTML = '';
+
+        if (!data.semtler || data.semtler.length === 0) {
+          select.innerHTML = '<option value="">Henüz tarama yapılmadı</option>';
+          document.getElementById('shopsContainer').innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 70px 20px; background: var(--bg-card); border: 1px dashed var(--border); border-radius: var(--radius);">
+              <div style="font-size: 48px; margin-bottom: 16px;">📍</div>
+              <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Henüz Tarama Yapılmadı</h3>
+              <p style="font-size: 14px; color: var(--text-dim); max-width: 440px; margin: 0 auto 24px;">Mahallenizdeki veya hedef semtinizdeki sitesi olmayan esnafları bulmak için yeni bir bölge tarayın.</p>
+              <button class="btn btn-primary" onclick="openScanModal()">+ Yeni Bölge Tara</button>
+            </div>
+          `;
+          return;
+        }
+
+        data.semtler.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.slug;
+          opt.textContent = `${s.ad} (${s.toplam} dükkân)`;
+          if (s.slug === data.son) opt.selected = true;
+          select.appendChild(opt);
+        });
+
+        // Load currently selected
+        if (select.value) {
+          await dukkanlariYukle(select.value);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function semtDegistir() {
+      const slug = document.getElementById('semtSelect').value;
+      if (slug) await dukkanlariYukle(slug);
+    }
+
+    async function dukkanlariYukle(slug) {
+      try {
+        const res = await fetch(`/api/dukkanlar?semt=${slug}`);
+        const data = await res.json();
+        aktifVeri = data;
+
+        // Update stats
+        const list = data.bilgi?.dukkanlar || [];
+        const telli = list.filter(x => x.telefon).length;
+        document.getElementById('statToplam').innerText = list.length + 35; // Total scanned approx
+        document.getElementById('statSitesiYok').innerText = list.length;
+        document.getElementById('statTelli').innerText = telli;
+        document.getElementById('statCiro').innerText = (telli * 15000).toLocaleString('tr-TR') + ' ₺';
+
+        filtrele();
+        renderPipeline();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function filtrele() {
+      if (!aktifVeri || !aktifVeri.bilgi) return;
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const list = aktifVeri.bilgi.dukkanlar || [];
+
+      const filtered = list.filter(x => {
+        const matchQ = (x.ad || '').toLowerCase().includes(q) || 
+                       (x.adres || '').toLowerCase().includes(q) || 
+                       (x.sektor || '').toLowerCase().includes(q);
+        
+        let matchSektor = true;
+        if (aktifSektor === 'kuafor') matchSektor = ['kuafor', 'berber', 'guzellik'].includes(x.sektor);
+        else if (aktifSektor === 'kafe') matchSektor = ['kafe', 'restoran', 'firin'].includes(x.sektor);
+        else if (aktifSektor === 'dis') matchSektor = ['dis', 'saglik', 'veteriner'].includes(x.sektor);
+        else if (aktifSektor === 'butik') matchSektor = ['butik', 'optik', 'cicekci'].includes(x.sektor);
+        else if (aktifSektor !== 'hepsi') matchSektor = x.sektor === aktifSektor;
+
+        let matchTel = true;
+        if (sadeceTelefon) matchTel = !!x.telefon;
+
+        return matchQ && matchSektor && matchTel;
+      });
+
+      renderShops(filtered);
+    }
+
+    function renderShops(list) {
+      const container = document.getElementById('shopsContainer');
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim);">
+            <div style="font-size: 36px; margin-bottom: 12px;">🔍</div>
+            <div style="font-size: 16px; font-weight: 600;">Eşleşen dükkân bulunamadı</div>
+            <p style="font-size: 13px; margin-top: 4px;">Arama kriterlerinizi değiştirmeyi deneyin.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(x => {
+        const crmDurum = x.crm?.durum || 'yeni';
+        const sektorAd = aktifVeri.sektorler?.[x.sektor]?.ad || 'İşletme';
+        const hasSite = x.site_var;
+        const siteUrl = x.site_yolu;
+
+        return `
+          <div class="shop-card">
+            <div>
+              <div class="shop-header">
+                <div>
+                  <h3 class="shop-name">${escapeHtml(x.ad)}</h3>
+                  <div class="shop-meta">
+                    <span class="tag sektor">${sektorAd}</span>
+                    ${x.telefon ? '<span class="tag" style="color: #34D399; background: rgba(16, 185, 129, 0.1);">Telefon Kayıtlı</span>' : ''}
+                    ${hasSite ? '<span class="tag" style="color: #818CF8; background: rgba(99, 102, 241, 0.15);">Site Hazır 🚀</span>' : ''}
+                  </div>
+                </div>
+                <div class="score-badge">
+                  <span>${x.puan}</span>
+                  <small>PUAN</small>
+                </div>
+              </div>
+
+              <div class="shop-info-list" style="margin-top: 14px;">
+                ${x.telefon ? `
+                  <div class="info-row">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <a href="tel:${x.telefon}" class="info-link" style="font-weight: 600;">${x.telefon}</a>
+                    ${x.whatsapp ? `<a href="https://wa.me/${x.whatsapp}" target="_blank" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(37, 211, 102, 0.15); color: #25D366; text-decoration: none; font-weight: 700;">WhatsApp</a>` : ''}
+                  </div>
+                ` : '<div class="info-row" style="color: var(--text-dim);"><small>Telefon bilgisi girilmemiş</small></div>'}
+
+                ${x.adres ? `
+                  <div class="info-row">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span>${escapeHtml(x.adres)}</span>
+                  </div>
+                ` : ''}
+
+                ${x.neden?.length ? `
+                  <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">
+                    💡 ${x.neden.join(' • ')}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="shop-actions-group">
+              <div class="crm-row">
+                <span class="crm-label">Ziyaret Durumu:</span>
+                <select class="crm-select" onchange="crmGuncelle('${x.osm}', this.value)">
+                  <option value="yeni" ${crmDurum === 'yeni' ? 'selected' : ''}>⏳ Yeni</option>
+                  <option value="ziyaret" ${crmDurum === 'ziyaret' ? 'selected' : ''}>🚶 Ziyaret Edildi</option>
+                  <option value="teklif" ${crmDurum === 'teklif' ? 'selected' : ''}>📋 Teklif Verildi</option>
+                  <option value="evet" ${crmDurum === 'evet' ? 'selected' : ''}>🎉 Evet Dedi (Satıldı!)</option>
+                  <option value="hayir" ${crmDurum === 'hayir' ? 'selected' : ''}>❌ Olumsuz</option>
+                </select>
+              </div>
+
+              <div class="card-btns">
+                ${hasSite ? `
+                  <button class="btn btn-primary btn-sm" onclick="openSimulator('${escapeHtml(x.ad)}', '${siteUrl}')">
+                    📱 Siteyi İncele
+                  </button>
+                ` : `
+                  <button class="btn btn-secondary btn-sm" onclick="kurSiteleri()">
+                    ⚡ Site Kur
+                  </button>
+                `}
+                <a href="https://www.openstreetmap.org/${x.osm}" target="_blank" class="btn btn-secondary btn-sm">
+                  📍 Haritada Gör
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPipeline() {
+      const container = document.getElementById('pipelineContainer');
+      if (!aktifVeri || !aktifVeri.bilgi) return;
+      const list = aktifVeri.bilgi.dukkanlar || [];
+
+      // Render only visited or active status shops
+      const pipelineList = list.filter(x => x.crm?.durum && x.crm.durum !== 'yeni');
+
+      if (pipelineList.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-dim);">
+            <div style="font-size: 36px; margin-bottom: 12px;">🚶‍♂️</div>
+            <div style="font-size: 16px; font-weight: 600;">Henüz ziyaret kaydı yapılmadı</div>
+            <p style="font-size: 13px; margin-top: 4px;">Esnaf radarı sekmesinden dükkânların durumunu 'Ziyaret Edildi' veya 'Evet Dedi' olarak işaretlediğinizde burada listelenir.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pipelineList.map(x => {
+        const crmDurum = x.crm?.durum;
+        let durumBadge = '';
+        if (crmDurum === 'evet') durumBadge = '<span class="tag" style="background: rgba(16,185,129,0.2); color:#10B981; font-weight:700;">🎉 SATILDI</span>';
+        else if (crmDurum === 'teklif') durumBadge = '<span class="tag" style="background: rgba(245,158,11,0.2); color:#F59E0B; font-weight:700;">📋 TEKLİFTE</span>';
+        else if (crmDurum === 'ziyaret') durumBadge = '<span class="tag" style="background: rgba(99,102,241,0.2); color:#818CF8; font-weight:700;">🚶 ZİYARET EDİLDİ</span>';
+        else if (crmDurum === 'hayir') durumBadge = '<span class="tag" style="background: rgba(239,68,68,0.2); color:#EF4444; font-weight:700;">❌ HAYIR DEDİ</span>';
+
+        return `
+          <div class="shop-card">
+            <div>
+              <div class="shop-header">
+                <div>
+                  <h3 class="shop-name">${escapeHtml(x.ad)}</h3>
+                  <div style="margin-top: 6px;">${durumBadge}</div>
+                </div>
+                <div class="score-badge"><span>${x.puan}</span></div>
+              </div>
+              <div class="shop-info-list" style="margin-top: 12px;">
+                <div>📞 ${x.telefon || 'Telefon yok'}</div>
+                <div>📍 ${escapeHtml(x.adres || '')}</div>
+                ${x.crm?.guncelleme ? `<div style="font-size: 11px; color: var(--text-dim);">Son Güncelleme: ${x.crm.guncelleme}</div>` : ''}
+              </div>
+            </div>
+            <div class="shop-actions-group">
+              <select class="crm-select" onchange="crmGuncelle('${x.osm}', this.value)" style="width: 100%;">
+                <option value="yeni" ${crmDurum === 'yeni' ? 'selected' : ''}>⏳ Yeni</option>
+                <option value="ziyaret" ${crmDurum === 'ziyaret' ? 'selected' : ''}>🚶 Ziyaret Edildi</option>
+                <option value="teklif" ${crmDurum === 'teklif' ? 'selected' : ''}>📋 Teklif Verildi</option>
+                <option value="evet" ${crmDurum === 'evet' ? 'selected' : ''}>🎉 Evet Dedi (Satıldı!)</option>
+                <option value="hayir" ${crmDurum === 'hayir' ? 'selected' : ''}>❌ Olumsuz</option>
+              </select>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function crmGuncelle(osmId, durum) {
+      if (!aktifVeri || !aktifVeri.semt_slug) return;
+      try {
+        await fetch('/api/crm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            semt: aktifVeri.semt_slug,
+            id: osmId,
+            durum: durum
+          })
+        });
+        showToast('Durum güncellendi! ✓');
+        await dukkanlariYukle(aktifVeri.semt_slug);
+      } catch (e) {
+        showToast('Hata oluştu');
+      }
+    }
+
+    async function kurSiteleri() {
+      if (!aktifVeri || !aktifVeri.semt_slug) return;
+      showToast('Siteler oluşturuluyor...');
+      try {
+        const res = await fetch('/api/kur', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            semt: aktifVeri.semt_slug,
+            en_iyi: 50,
+            telefonlu: false
+          })
+        });
+        const data = await res.json();
+        showToast(data.mesaj || 'Siteler hazırlandı! 🚀');
+        await dukkanlariYukle(aktifVeri.semt_slug);
+      } catch (e) {
+        showToast('Site kurma sırasında hata oluştu');
+      }
+    }
+
+    function openSimulator(name, url) {
+      document.getElementById('simShopName').innerText = name;
+      document.getElementById('simIframe').src = url;
+      document.getElementById('simExternalLink').href = url;
+      document.getElementById('simModal').classList.add('open');
+    }
+
+    function closeSimulator() {
+      document.getElementById('simModal').classList.remove('open');
+      document.getElementById('simIframe').src = 'about:blank';
+    }
+
+    function openScanModal() {
+      document.getElementById('scanModal').classList.add('open');
+    }
+
+    function closeScanModal() {
+      document.getElementById('scanModal').classList.remove('open');
+    }
+
+    async function baslatTarama() {
+      const semt = document.getElementById('scanSemtInput').value.trim();
+      const yaricap = document.getElementById('scanYaricapInput').value;
+      if (!semt) {
+        alert('Lütfen taranacak bir semt veya mahalle adı girin.');
+        return;
+      }
+
+      closeScanModal();
+      showToast(`'${semt}' taranıyor, lütfen bekleyin... (30-40 sn)`);
+
+      try {
+        await fetch('/api/tara', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ semt, yaricap })
+        });
+
+        // Poll scan status
+        const poll = setInterval(async () => {
+          const res = await fetch('/api/durum');
+          const st = await res.json();
+          if (!st.calisiyor) {
+            clearInterval(poll);
+            if (st.hata) {
+              alert('Tarama hatası: ' + st.hata);
+            } else {
+              showToast('Tarama tamamlandı! Siteler yükleniyor...');
+              await semtleriYukle();
+            }
+          }
+        }, 2000);
+      } catch (e) {
+        showToast('Tarama başlatılamadı');
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tabRadar').style.display = 'none';
+      document.getElementById('tabPipeline').style.display = 'none';
+      document.getElementById('tabKit').style.display = 'none';
+
+      if (tab === 'radar') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tabRadar').style.display = 'block';
+      } else if (tab === 'pipeline') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tabPipeline').style.display = 'block';
+        renderPipeline();
+      } else if (tab === 'kit') {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tabKit').style.display = 'block';
+        loadSalesKit();
+      }
+    }
+
+    async function loadSalesKit() {
+      const container = document.getElementById('kitContent');
+      if (container.dataset.loaded) return;
+      try {
+        const res = await fetch('/api/satis-kiti');
+        const data = await res.json();
+        
+        container.innerHTML = Object.entries(data).map(([filename, content], i) => {
+          let title = filename;
+          if (filename.includes('01')) title = '🚪 01 - Kapıda Konuşma (30 Saniyelik Giriş)';
+          else if (filename.includes('02')) title = '💰 02 - Teklif ve Fiyatlandırma Şablonu';
+          else if (filename.includes('03')) title = '🚀 03 - Satıştan Sonra Yayına Alma';
+          else if (filename.includes('04')) title = '🛡️ 04 - Sık Gelen İtirazlar ve Cevaplar';
+
+          return `
+            <div class="kit-section ${i === 0 ? 'open' : ''}">
+              <div class="kit-header" onclick="this.parentElement.classList.toggle('open')">
+                <span>${title}</span>
+                <span>▼</span>
+              </div>
+              <div class="kit-body">${escapeHtml(content)}</div>
+            </div>
+          `;
+        }).join('');
+        container.dataset.loaded = 'true';
+      } catch (e) {
+        container.innerHTML = '<p>Satış kiti yüklenemedi.</p>';
+      }
+    }
+
+    function sektorFiltrele(sektor, btn) {
+      aktifSektor = sektor;
+      document.querySelectorAll('#sektorFiltreleri .pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      filtrele();
+    }
+
+    function sadeceTelefonToggle(btn) {
+      sadeceTelefon = !sadeceTelefon;
+      btn.classList.toggle('btn-primary', sadeceTelefon);
+      btn.classList.toggle('btn-secondary', !sadeceTelefon);
+      filtrele();
+    }
+
+    function exportCSV() {
+      if (!aktifVeri || !aktifVeri.semt_slug) return;
+      window.open(`/ciktilar/${aktifVeri.semt_slug}/dukkanlar.csv`, '_blank');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>

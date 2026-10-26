@@ -24,6 +24,17 @@ import time
 import urllib.parse
 import urllib.request
 
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 KOK = os.path.dirname(os.path.abspath(__file__))
 CIKTI = os.path.join(KOK, "ciktilar")
 UA = {"User-Agent": "mahalle-avcisi/1.0 (+https://yapaytu.com/mahalle)"}
@@ -97,11 +108,34 @@ def get_json(url, data=None, deneme=3):
 
 
 def konum_bul(semt):
-    q = urllib.parse.urlencode({"q": semt, "format": "jsonv2", "limit": 1, "countrycodes": "tr", "accept-language": "tr"})
-    s = get_json("https://nominatim.openstreetmap.org/search?" + q)
-    if not s:
-        raise SystemExit(f'"{semt}" bulunamadı. İlçe/mahalle adını il ile birlikte yaz: "Moda, Kadıköy, İstanbul"')
-    return s[0]
+    varyasyonlar = [semt]
+    
+    # 1. "kadı köy" -> "kadıköy", "yeşil yurt" -> "yeşilyurt" gibi birleşik yazılması gereken kelimeleri düzelt
+    birlesik = re.sub(r'(?i)\b(\w+)\s+(paşa|pasa|köy|koy|tepe|kale|pınar|pinar|ova|kent|hisar|evler|kuyu)\b', r'\1\2', semt)
+    if birlesik != semt:
+        varyasyonlar.append(birlesik)
+        
+    # 2. Sokak, cadde, numara gibi detayları temizleyerek ana mahalleyi/ilçeyi arat
+    temiz = re.sub(r'(?i)\b\w+\s+(sokak|sokağı|sokakı|sok|soka|cadde|caddesi|cad|bulvar|bulvarı|yol|yolu|no:\s*\d+|no\s*\d+)\b', '', birlesik)
+    temiz = re.sub(r'\s+', ' ', temiz).strip()
+    if temiz and temiz not in varyasyonlar:
+        varyasyonlar.append(temiz)
+        
+    # 3. Virgülle yazılmışsa sondan başa doğru (İlçe, İl) kombinasyonlarını dene
+    parcalar = [p.strip() for p in re.split(r'[,/]+', semt) if p.strip()]
+    if len(parcalar) > 1:
+        varyasyonlar.append(", ".join(parcalar[1:]))
+
+    for v in varyasyonlar:
+        q = urllib.parse.urlencode({"q": v, "format": "jsonv2", "limit": 1, "countrycodes": "tr", "accept-language": "tr"})
+        try:
+            s = get_json("https://nominatim.openstreetmap.org/search?" + q)
+            if s:
+                return s[0]
+        except Exception:
+            continue
+
+    raise SystemExit(f'"{semt}" haritada bulunamadı. Lütfen ilçe ve mahalle adını şu formatta yaz: "Moda, Kadıköy, İstanbul" veya "Alsancak, Konak, İzmir"')
 
 
 def overpass(sorgu):
@@ -172,7 +206,7 @@ def tara(args):
         for x in dukkanlar:
             w.writerow([x["puan"], x["ad"], SEKTOR[x["sektor"]]["ad"], x["telefon"], x["adres"], x["saatler"], x["instagram"], ", ".join(x["neden"]),
                         f"https://www.openstreetmap.org/{x['osm']}"])
-    open(os.path.join(KOK, "ciktilar", ".son"), "w").write(klasor)
+    open(os.path.join(KOK, "ciktilar", ".son"), "w", encoding="utf-8").write(klasor)
     telli = sum(1 for x in dukkanlar if x["telefon"])
     print(f"\n✓ {len(E)} işletme tarandı, {len(dukkanlar)} tanesinin sitesi yok ({telli} tanesinin telefonu kayıtlı). {time.time() - t0:.0f} sn.")
     print(f"  Liste: {os.path.relpath(klasor, KOK)}/dukkanlar.csv  (Excel'de açılır)\n")
@@ -261,7 +295,7 @@ def son_klasor(args):
         k = os.path.join(CIKTI, slug(args.semt.split(",")[0]))
     else:
         try:
-            k = open(os.path.join(CIKTI, ".son")).read().strip()
+            k = open(os.path.join(CIKTI, ".son"), encoding="utf-8").read().strip()
         except FileNotFoundError:
             raise SystemExit('Önce tarama yap:  python3 mahalle_avcisi.py tara "Semt, İl"')
     if not os.path.exists(os.path.join(k, "dukkanlar.json")):

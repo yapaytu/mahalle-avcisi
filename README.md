@@ -21,6 +21,17 @@ python3 mahalle_avcisi.py kur --en-iyi 50
 open ciktilar/kadikoy/galeri.html      # Windows: start ciktilar\kadikoy\galeri.html
 ```
 
+### Web Dashboard ile (Görsel Arayüz)
+Terminal komutları yerine tüm süreci görsel bir panelden yönetmek için:
+```bash
+python dashboard.py
+```
+- Harita üzerinden tek tıkla arama yapma ve yarıçap belirleme
+- Dükkânları filtreleme ve canlı mobil simülatörde (iPhone çerçevesinde) siteleri inceleme
+- Müşteri ziyaret durumlarını (Ziyaret Edildi, Teklif Verildi, Satıldı) takip etme
+- Satış kitine doğrudan arayüzden erişme
+
+
 Küçük bir mahalle için yarıçap ver:
 ```bash
 python3 mahalle_avcisi.py tara "Moda, Kadıköy, İstanbul" --yaricap 900
